@@ -6,6 +6,7 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -24,7 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SelectionData implements ITestListener {
+public class SelectionData extends RetryAnalyzer implements ITestListener {
     WebDriver driver;
     ExtentReports extent;
     ExtentTest test;
@@ -45,7 +46,8 @@ public class SelectionData implements ITestListener {
     public void SelectionData() throws InterruptedException {
         test = extent.createTest("Selection Data Test");
         WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
+        driver = new ChromeDriver();
+
         driver.manage().window().maximize();
         driver.get("https://www.saucedemo.com/v1/");
         driver.findElement(By.xpath("//input[@id =\"user-name\"]")).sendKeys("standard_user");
@@ -109,6 +111,12 @@ public class SelectionData implements ITestListener {
 
         File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         File destFile = new File(filePath);
+
+        try {
+            FileUtils.copyFile(srcFile, destFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return filePath;
     }
